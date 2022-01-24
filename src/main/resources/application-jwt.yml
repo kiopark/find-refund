@@ -1,0 +1,5 @@
+spring:
+  jwt:
+    header: Authorization
+    secret: szsproject {AccessToken}
+    token-validity-in-seconds: 864000
