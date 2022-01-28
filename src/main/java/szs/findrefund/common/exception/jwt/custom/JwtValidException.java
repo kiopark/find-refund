@@ -1,4 +1,4 @@
-package szs.findrefund.common.exception.custom;
+package szs.findrefund.common.exception.jwt.custom;
 
 import szs.findrefund.common.enums.JwtExceptionEnum;
 

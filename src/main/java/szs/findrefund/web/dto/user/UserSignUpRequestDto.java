@@ -6,15 +6,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import szs.findrefund.domain.user.User;
-import szs.findrefund.util.AESCryptoUtil;
 
 import javax.validation.constraints.NotBlank;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import static szs.findrefund.common.Constants.PatternConst.*;
-
-@ApiModel(value = "SignUp Info")
+@ApiModel(value = "회원가입 요청정보")
 @Getter
 @NoArgsConstructor
 public class UserSignUpRequestDto {
@@ -28,9 +23,11 @@ public class UserSignUpRequestDto {
   private String password;
 
   @ApiModelProperty(value = "이름")
+  @NotBlank(message = "이름을 입력해주세요.")
   private String name;
 
   @ApiModelProperty(value = "주민등록번호")
+  @NotBlank(message = "주민등록번호를 입력해주세요.")
   private String regNo;
 
   @Builder

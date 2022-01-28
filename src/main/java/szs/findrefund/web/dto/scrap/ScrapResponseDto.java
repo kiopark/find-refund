@@ -2,6 +2,8 @@ package szs.findrefund.web.dto.scrap;
 
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 public class ScrapResponseDto {
   private JsonListDto jsonList;
@@ -10,7 +12,7 @@ public class ScrapResponseDto {
 
   private String hostNm;
 
-  private String workerResDt;
+  private LocalDateTime workerResDt;
 
-  private String workerReqDt;
+  private LocalDateTime workerReqDt;
 }

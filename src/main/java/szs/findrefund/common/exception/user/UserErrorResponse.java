@@ -1,4 +1,4 @@
-package szs.findrefund.common.exception;
+package szs.findrefund.common.exception.user;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -7,19 +7,19 @@ import szs.findrefund.common.enums.UserExceptionEnum;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ErrorResponse {
+public class UserErrorResponse {
 
   private String errorCode;
   private String msg;
 
 
-  private ErrorResponse(UserExceptionEnum userExceptionEnum) {
+  private UserErrorResponse(UserExceptionEnum userExceptionEnum) {
     this.errorCode = userExceptionEnum.getErrorCode();
     this.msg = userExceptionEnum.getMsg();
   }
 
-  public static ErrorResponse of(UserExceptionEnum userExceptionEnum) {
-    return new ErrorResponse(userExceptionEnum);
+  public static UserErrorResponse of(UserExceptionEnum userExceptionEnum) {
+    return new UserErrorResponse(userExceptionEnum);
   }
 
 }

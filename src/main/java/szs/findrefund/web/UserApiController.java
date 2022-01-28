@@ -8,13 +8,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import szs.findrefund.api.ResponseService;
-import szs.findrefund.api.SingleResult;
 import szs.findrefund.service.user.UserService;
 import szs.findrefund.web.dto.jwt.JwtResponseDto;
 import szs.findrefund.web.dto.user.UserInfoResponseDto;
 import szs.findrefund.web.dto.user.UserLoginRequestDto;
 import szs.findrefund.web.dto.user.UserSignUpRequestDto;
+import szs.findrefund.web.dto.user.UserSignUpResponseDto;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,19 +24,18 @@ import javax.servlet.http.HttpServletRequest;
 public class UserApiController {
 
   private final UserService userService;
-  private final ResponseService responseService;
 
   @ApiOperation(value = "회원가입", notes = "회원가입을 진행 합니다.")
   @PostMapping("/signup")
-  public SingleResult<Long> signUp(@ApiParam(value = "회원가입 정보")
+  public ResponseEntity<UserSignUpResponseDto> signUp(@ApiParam(value = "회원가입 정보")
                                    @RequestBody @Validated UserSignUpRequestDto requestDto) throws Exception {
-    return responseService.getSingleResult(userService.signUp(requestDto));
+    return ResponseEntity.ok().body(userService.signUp(requestDto));
   }
 
   @ApiOperation(value = "로그인", notes = "로그인을 진행 합니다.")
   @PostMapping("/login")
   public ResponseEntity<JwtResponseDto> login(@ApiParam(value = "로그인 정보")
-                                                @RequestBody @Validated UserLoginRequestDto requestDto) throws Exception {
+                                              @RequestBody @Validated UserLoginRequestDto requestDto) throws Exception {
     String jwtToken = userService.login(requestDto);
     return ResponseEntity.ok().body(new JwtResponseDto(jwtToken));
   }

@@ -3,7 +3,6 @@ package szs.findrefund.common;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import javax.crypto.SecretKey;
 import java.math.BigDecimal;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -13,12 +12,20 @@ public class Constants {
    * 근로소득 세액공제 상수 Class
    */
   public static final class RefundConst {
-    /*  */
+    /* 3,300만원 이하 총 지급액 */
     public static final BigDecimal MIN_PAYMENT_AMOUNT = BigDecimal.valueOf(33000000);
-    /*  */
+    /* 7,000만원 초과 총 지급액 */
     public static final BigDecimal MAX_PAYMENT_AMOUNT = BigDecimal.valueOf(70000000);
-    /*  */
-    public static final BigDecimal BASE_REFUND_AMOUNT = BigDecimal.valueOf(740000);
+    /* 공제 요건 최고 기준 */
+    public static final BigDecimal MAX_REFUND_AMOUNT = BigDecimal.valueOf(740000);
+    /* 공제 요건 중간 기준 */
+    public static final BigDecimal MIDDLE_REFUND_AMOUNT = BigDecimal.valueOf(660000);
+    /* 공제 요건 최저 기준 */
+    public static final BigDecimal MIN_REFUND_AMOUNT = BigDecimal.valueOf(500000);
+    /* 산출세액 기준 */
+    public static final BigDecimal TAX_AMOUNT = BigDecimal.valueOf(1300000);
+    /* 공재액 */
+    public static final BigDecimal DEDUCTION_AMOUNT = BigDecimal.valueOf(715000);
   }
 
   /**
@@ -37,8 +44,8 @@ public class Constants {
     public static final String REGIST_REG_NO_RULE = "\\d{6}\\-[1-4]\\d{6}";
     /*  */
     public static final String[] EXCLUDE_PATTERNS = {
-        "/", "/error", "/csrf", "/swagger-ui.html", "/swagger-resources/**", "/v2/api-docs",
-        "/webjars/**", "/*/*/login", "/*/*/signup", "/*/*/me"};
+        "/", "/error", "/csrf", "/favicon.ico", "/swagger-ui.html", "/swagger-resources/**",
+        "/v2/api-docs", "/webjars/**", "/*/*/login", "/*/*/signup", "/h2-console/**"};
   }
 
   /**

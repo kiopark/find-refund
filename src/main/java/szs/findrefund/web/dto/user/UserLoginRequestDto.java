@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @NoArgsConstructor
-@ApiModel(value = "Login Info")
+@ApiModel(value = "로그인")
 public class UserLoginRequestDto {
 
   @ApiModelProperty("아이디")

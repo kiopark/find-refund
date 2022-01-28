@@ -1,15 +1,18 @@
 package szs.findrefund.service.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import szs.findrefund.common.enums.AvailableUserEnum;
+import szs.findrefund.common.enums.SignUpEnum;
 import szs.findrefund.common.enums.UserExceptionEnum;
-import szs.findrefund.common.exception.custom.*;
+import szs.findrefund.common.exception.user.custom.*;
 import szs.findrefund.domain.user.User;
 import szs.findrefund.domain.user.UserRepository;
 import szs.findrefund.util.JWTUtil;
+import szs.findrefund.web.dto.scrap.ScrapRequestDto;
 import szs.findrefund.web.dto.user.*;
 
 import java.util.regex.Pattern;
@@ -28,7 +31,7 @@ public class UserService {
    * 회원가입
    */
   @Transactional
-  public Long signUp(UserSignUpRequestDto requestDto) throws Exception {
+  public UserSignUpResponseDto signUp(UserSignUpRequestDto requestDto) throws Exception {
 
     availableUsers(requestDto);
     validateDuplicateUsers(requestDto);
@@ -36,7 +39,8 @@ public class UserService {
     requestDto.encryptTheRegNo(encryptRegNo);
     requestDto.encryptThePassword(passwordEncoder.encode(requestDto.getPassword()));
 
-    return userRepository.save(requestDto.toEntity()).getId();
+    Long success = userRepository.save(requestDto.toEntity()).getId();
+    return SignUpEnum.signUpResult(success);
   }
 
   /**
@@ -89,7 +93,7 @@ public class UserService {
   /**
    * 내 정보 조회
    */
-  @Transactional
+  @Transactional(readOnly = true)
   public UserInfoResponseDto findMyInfo(String jwtToken) throws Exception {
     Long idFromToken = JWTUtil.getIdFromToken(jwtToken);
     User findUser = userRepository.findById(idFromToken)
@@ -100,6 +104,21 @@ public class UserService {
                               .name(findUser.getName())
                               .regNo(decrypt(findUser.getRegNo()))
                               .build();
+  }
+
+  /**
+   * URL 스크랩 위한 정보 조회
+   */
+  @Transactional(readOnly = true)
+  public ScrapRequestDto findMyInfoForUrlScrap(String jwtToken) throws Exception {
+    Long idFromToken = JWTUtil.getIdFromToken(jwtToken);
+    User findUser = userRepository.findById(idFromToken)
+                                  .orElseThrow(UserNotFoundException::new);
+
+    return ScrapRequestDto.builder()
+                          .name(findUser.getName())
+                          .regNo(decrypt(findUser.getRegNo()))
+                          .build();
   }
 
 }

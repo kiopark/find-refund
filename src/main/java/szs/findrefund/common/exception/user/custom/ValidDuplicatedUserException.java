@@ -1,4 +1,4 @@
-package szs.findrefund.common.exception.custom;
+package szs.findrefund.common.exception.user.custom;
 
 import szs.findrefund.common.enums.UserExceptionEnum;
 

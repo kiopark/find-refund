@@ -1,6 +1,7 @@
 package szs.findrefund.util;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -88,10 +89,10 @@ public class JWTUtil {
    */
   public static Claims getClaimsFromToken(String jwt) {
     return Jwts.parserBuilder()
-        .setSigningKey(secretKey.getBytes())
-        .build()
-        .parseClaimsJws(jwt)
-        .getBody();
+               .setSigningKey(secretKey.getBytes())
+               .build()
+               .parseClaimsJws(jwt)
+               .getBody();
   }
 
   /**
@@ -114,7 +115,7 @@ public class JWTUtil {
    */
   public static boolean isValidToken(String token) {
     Claims claims = getClaimsFromToken(token);
-    return claims.getExpiration().before(new Date());
+    return !claims.getExpiration().before(new Date());
   }
 
 }

@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import szs.findrefund.service.refund.RefundService;
+import szs.findrefund.service.income.IncomeService;
+import szs.findrefund.web.dto.refund.RefundResponseDto;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,24 +18,23 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/szs")
-public class RefundApiController {
+public class IncomeApiController {
 
-  private final RefundService refundService;
+  private final IncomeService incomeService;
 
   @ApiOperation(value = "URL 스크랩", notes = "제공된 스크랩 URL 을 호출 합니다.")
   @PostMapping("/scrap")
   public ResponseEntity<String> userScrap(HttpServletRequest request) throws Exception {
     String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-    refundService.saveScrapData(jwtToken);
-    return ResponseEntity.ok("성공!");
+    incomeService.saveScrapData(jwtToken);
+    return ResponseEntity.ok("요청 완료!");
   }
 
-  @ApiOperation(value = "환급 조회", notes = "환급 받을 세액공제를 조회 합니다.")
+  @ApiOperation(value = "환급 조회", notes = "환급 정보를 조회 합니다.")
   @GetMapping("/refund")
-  public ResponseEntity<String> refund(HttpServletRequest request) throws Exception {
+  public ResponseEntity<RefundResponseDto> refund(HttpServletRequest request) throws Exception {
     String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-    refundService.selectMyRefund(jwtToken);
-    return ResponseEntity.ok("성공!");
+    return ResponseEntity.ok().body(incomeService.selectMyRefund(jwtToken));
   }
 
 }

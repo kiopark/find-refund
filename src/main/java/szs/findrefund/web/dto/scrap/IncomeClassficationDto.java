@@ -1,19 +1,24 @@
 package szs.findrefund.web.dto.scrap;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import szs.findrefund.domain.incomeClassfication.IncomeClassfication;
 
 import java.math.BigDecimal;
 
 @Getter
 public class IncomeClassficationDto {
 
-  /**
-   * 소득구분
-   */
-  private BigDecimal classfication;
+  @JsonProperty(value = "소득구분")
+  private String classfication;
 
-  /**
-   * 사용금액
-   */
-  private BigDecimal usedAmount;
+  @JsonProperty(value = "총사용금액")
+  private BigDecimal usedTotalAmount;
+
+  public IncomeClassfication toEntity() {
+    return IncomeClassfication.builder()
+        .classfication(classfication)
+        .usedTotalAmount(usedTotalAmount)
+        .build();
+  }
 }
