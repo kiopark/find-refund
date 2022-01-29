@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import szs.findrefund.domain.BaseTimeEntity;
-import szs.findrefund.domain.income.Income;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

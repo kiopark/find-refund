@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import szs.findrefund.service.user.UserService;
+import szs.findrefund.util.JWTUtil;
 import szs.findrefund.web.dto.jwt.JwtResponseDto;
 import szs.findrefund.web.dto.user.UserInfoResponseDto;
 import szs.findrefund.web.dto.user.UserLoginRequestDto;
@@ -44,7 +45,8 @@ public class UserApiController {
   @GetMapping("/me")
   public ResponseEntity<UserInfoResponseDto> me(HttpServletRequest request) throws Exception {
     String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-    return ResponseEntity.ok().body(userService.findMyInfo(jwtToken));
+    Long idFromToken = JWTUtil.getIdFromToken(jwtToken);
+    return ResponseEntity.ok().body(userService.findMyInfo(idFromToken));
   }
 
 }

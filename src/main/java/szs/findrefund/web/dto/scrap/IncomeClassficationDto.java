@@ -1,6 +1,7 @@
 package szs.findrefund.web.dto.scrap;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Getter;
 import szs.findrefund.domain.incomeClassfication.IncomeClassfication;
 
@@ -20,5 +21,11 @@ public class IncomeClassficationDto {
         .classfication(classfication)
         .usedTotalAmount(usedTotalAmount)
         .build();
+  }
+
+  @Builder
+  public IncomeClassficationDto(String classfication, BigDecimal usedTotalAmount) {
+    this.classfication = classfication;
+    this.usedTotalAmount = usedTotalAmount;
   }
 }

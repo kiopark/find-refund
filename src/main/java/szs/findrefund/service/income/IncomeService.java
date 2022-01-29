@@ -1,7 +1,6 @@
 package szs.findrefund.service.income;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +14,7 @@ import szs.findrefund.domain.income.IncomeRepository;
 import szs.findrefund.domain.scrapLog.ScrapLog;
 import szs.findrefund.domain.scrapStatus.ScrapStatus;
 import szs.findrefund.service.user.UserService;
+import szs.findrefund.util.JWTUtil;
 import szs.findrefund.web.dto.refund.RefundResponseDto;
 import szs.findrefund.web.dto.scrap.*;
 import szs.findrefund.web.dto.user.UserInfoResponseDto;
@@ -59,7 +59,8 @@ public class IncomeService {
    * WebClient 를 통해 스크랩 URL 호출
    */
   public Mono<ScrapResponseDto> userScrapApiCall(String accessToken) throws Exception {
-    ScrapRequestDto requestDto = userService.findMyInfoForUrlScrap(accessToken);
+    Long idFromToken = JWTUtil.getIdFromToken(accessToken);
+    ScrapRequestDto requestDto = userService.findMyInfoForUrlScrap(idFromToken);
 
     return webClient.mutate()
                     .build()
@@ -78,7 +79,7 @@ public class IncomeService {
 
 
   /**
-   * ULR 스크랩 결과 정보를 Entity 로 매칭
+   * URL 스크랩 결과 정보를 Entity 로 매칭
    */
   private Income dtoMatchEntity(ScrapResponseDto responseDto) throws Exception {
     JsonListDto jsonList = responseDto.getJsonList();
@@ -123,8 +124,8 @@ public class IncomeService {
    * 환급액 조회
    */
   @Transactional(readOnly = true)
-  public RefundResponseDto selectMyRefund(String jwtToken) throws Exception {
-    UserInfoResponseDto myInfo = userService.findMyInfo(jwtToken);
+  public RefundResponseDto selectMyRefund(Long idFromToken) throws Exception {
+    UserInfoResponseDto myInfo = userService.findMyInfo(idFromToken);
     Income findIncome = incomeRepository.findByRegNo(encrypt(myInfo.getRegNo()))
                                         .orElseThrow(UserNotFoundException::new);
     return calcRefund(findIncome);
@@ -155,13 +156,13 @@ public class IncomeService {
    *  공제액 계산
    */
   private BigDecimal taxDeductionCalc(BigDecimal amount) {
-    BigDecimal resultAmount = MAX_REFUND_AMOUNT;
+    BigDecimal resultAmount = BigDecimal.ZERO;
 
     switch (DeductionAmountEnum.findDeductionStandard(amount)) {
-      case 산출세액_이하 :
+      case 산출세액_기준_이하 :
         resultAmount = amount.multiply(new BigDecimal(0.55));
         break;
-      case 산출세액_초과 :
+      case 산출세액_기준_초과 :
         resultAmount = DEDUCTION_AMOUNT.add((amount.subtract(TAX_AMOUNT)).multiply(new BigDecimal(0.3)));
         break;
     }
@@ -180,13 +181,13 @@ public class IncomeService {
              calcAmount = MAX_REFUND_AMOUNT.subtract((amount.subtract(MIN_PAYMENT_AMOUNT))
                                            .multiply(new BigDecimal(0.008)));
 
-             resultAmount = amount.compareTo(MIDDLE_REFUND_AMOUNT) < 0 ? MIDDLE_REFUND_AMOUNT : calcAmount;
+             resultAmount = calcAmount.compareTo(MIDDLE_REFUND_AMOUNT) < 0 ? MIDDLE_REFUND_AMOUNT : calcAmount;
         break;
       case 총지급액_최대초과 :
              calcAmount = MIDDLE_REFUND_AMOUNT.subtract((amount.subtract(MAX_PAYMENT_AMOUNT))
                                               .divide(new BigDecimal(2)));
 
-             resultAmount = amount.compareTo(MIN_REFUND_AMOUNT) < 0 ? MIN_REFUND_AMOUNT : calcAmount;
+             resultAmount = calcAmount.compareTo(MIN_REFUND_AMOUNT) < 0 ? MIN_REFUND_AMOUNT : calcAmount;
         break;
     }
     return resultAmount;

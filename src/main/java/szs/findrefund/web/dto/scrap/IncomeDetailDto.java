@@ -1,6 +1,7 @@
 package szs.findrefund.web.dto.scrap;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Getter;
 import szs.findrefund.domain.income.Income;
 
@@ -39,4 +40,20 @@ public class IncomeDetailDto {
   @JsonProperty("사업자등록번호")
   private String enterpriseRegNo;
 
+  @Builder
+
+  public IncomeDetailDto(String incomeType, BigDecimal totalPaymentAmount, String businessStartDate,
+                         String enterpriseName, String userName, String regNo, String paymentDate,
+                         String businessEndDate, String incomeDivision, String enterpriseRegNo) {
+    this.incomeType = incomeType;
+    this.totalPaymentAmount = totalPaymentAmount;
+    this.businessStartDate = businessStartDate;
+    this.enterpriseName = enterpriseName;
+    this.userName = userName;
+    this.regNo = regNo;
+    this.paymentDate = paymentDate;
+    this.businessEndDate = businessEndDate;
+    this.incomeDivision = incomeDivision;
+    this.enterpriseRegNo = enterpriseRegNo;
+  }
 }

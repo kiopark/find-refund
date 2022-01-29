@@ -1,7 +1,6 @@
 package szs.findrefund.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +10,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import szs.findrefund.common.enums.CommonExceptionEnum;
 import szs.findrefund.service.user.UserService;
 import szs.findrefund.web.dto.jwt.JwtResponseDto;
-import szs.findrefund.web.dto.scrap.ScrapRequestDto;
 import szs.findrefund.web.dto.user.UserLoginRequestDto;
 import szs.findrefund.web.dto.user.UserSignUpRequestDto;
 import szs.findrefund.web.dto.user.UserSignUpResponseDto;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -42,10 +42,12 @@ class UserApiControllerTest {
     when(userService.signUp(requestDto)).thenReturn(new UserSignUpResponseDto());
 
     // when
-    ResultActions resultActions = requestUserSaveDto(requestDto);
+    ResultActions resultActions = requestPostSignUp(requestDto);
 
     // then
-    resultActions.andExpect(status().isOk());
+    resultActions
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("msg").value(CommonExceptionEnum.INVALID_INPUT_VALUE.getMsg()));
   }
 
   @DisplayName("[password 미입력] 회원가입 실패")
@@ -56,10 +58,12 @@ class UserApiControllerTest {
     when(userService.signUp(requestDto)).thenReturn(new UserSignUpResponseDto());
 
     // when
-    ResultActions resultActions = requestUserSaveDto(requestDto);
+    ResultActions resultActions = requestPostSignUp(requestDto);
 
     // then
-    resultActions.andExpect(status().isOk());
+    resultActions
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("msg").value(CommonExceptionEnum.INVALID_INPUT_VALUE.getMsg()));
   }
 
   @DisplayName("[name 미입력] 회원가입 실패")
@@ -70,10 +74,12 @@ class UserApiControllerTest {
     when(userService.signUp(requestDto)).thenReturn(new UserSignUpResponseDto());
 
     // when
-    ResultActions resultActions = requestUserSaveDto(requestDto);
+    ResultActions resultActions = requestPostSignUp(requestDto);
 
     // then
-    resultActions.andExpect(status().isOk());
+    resultActions
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("msg").value(CommonExceptionEnum.INVALID_INPUT_VALUE.getMsg()));
   }
 
   @DisplayName("[regNo 미입력] 회원가입 실패")
@@ -84,24 +90,28 @@ class UserApiControllerTest {
     when(userService.signUp(requestDto)).thenReturn(new UserSignUpResponseDto());
 
     // when
-    ResultActions resultActions = requestUserSaveDto(requestDto);
+    ResultActions resultActions = requestPostSignUp(requestDto);
 
     // then
-    resultActions.andExpect(status().isOk());
+    resultActions
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("msg").value(CommonExceptionEnum.INVALID_INPUT_VALUE.getMsg()));
   }
 
-  @DisplayName("[아이디 중복] 회원가입 실패")
+  @DisplayName("잘못된 HTTP Method 요청")
   @Test
-  void SignUp_Fail_Duplicated_UserId() throws Exception {
+  void SignUp_Not_Allowed_Method() throws Exception {
     // given
     final UserSignUpRequestDto requestDto = signUpDto("");
     when(userService.signUp(requestDto)).thenReturn(new UserSignUpResponseDto());
 
     // when
-    ResultActions resultActions = requestUserSaveDto(requestDto);
+    ResultActions resultActions = requestGetSignUp(requestDto);
 
     // then
-    resultActions.andExpect(status().isBadRequest());
+    resultActions
+        .andExpect(status().isMethodNotAllowed())
+        .andExpect(jsonPath("msg").value(CommonExceptionEnum.METHOD_NOT_ALLOWED.getMsg()));
   }
 
   @DisplayName("회원가입 성공")
@@ -112,7 +122,7 @@ class UserApiControllerTest {
     when(userService.signUp(requestDto)).thenReturn(new UserSignUpResponseDto());
 
     // when
-    ResultActions resultActions = requestUserSaveDto(requestDto);
+    ResultActions resultActions = requestPostSignUp(requestDto);
 
     // then
     resultActions.andExpect(status().isOk());
@@ -126,12 +136,11 @@ class UserApiControllerTest {
     when(userService.login(requestDto)).thenReturn(String.valueOf(new JwtResponseDto(null)));
 
     // when
-    ResultActions resultActions = requestUserLoginDto(requestDto);
+    ResultActions resultActions = requestPostLogin(requestDto);
 
     // then
-    MvcResult mvcResult = resultActions.andExpect(status().isOk()).andReturn();
-    String accessToken = mvcResult.getResponse().getContentAsString();
-    Assertions.assertThat(accessToken).isNotNull();
+    resultActions.andExpect(status().isOk())
+                 .andExpect(jsonPath("$.accessToken").doesNotExist());
   }
 
   @DisplayName("[passWord 미입력] 로그인 실패")
@@ -142,12 +151,11 @@ class UserApiControllerTest {
     when(userService.login(requestDto)).thenReturn(String.valueOf(new JwtResponseDto(null)));
 
     // when
-    ResultActions resultActions = requestUserLoginDto(requestDto);
+    ResultActions resultActions = requestPostLogin(requestDto);
 
     // then
-    MvcResult mvcResult = resultActions.andExpect(status().isOk()).andReturn();
-    String accessToken = mvcResult.getResponse().getContentAsString();
-    Assertions.assertThat(accessToken).isNotNull();
+    resultActions.andExpect(status().isOk())
+                 .andExpect(jsonPath("$.accessToken").doesNotExist());
   }
 
   @DisplayName("로그인 성공")
@@ -158,32 +166,51 @@ class UserApiControllerTest {
     when(userService.login(requestDto)).thenReturn(String.valueOf(new JwtResponseDto(null)));
 
     // when
-    ResultActions resultActions = requestUserLoginDto(requestDto);
+    ResultActions resultActions = requestPostLogin(requestDto);
 
     // then
     MvcResult mvcResult = resultActions.andExpect(status().isOk()).andReturn();
     String accessToken = mvcResult.getResponse().getContentAsString();
-    Assertions.assertThat(accessToken).isNotNull();
+    assertThat(accessToken).isNotEmpty();
   }
 
-  @DisplayName("제공된 URL을 통한 데이터 스크랩")
+  @DisplayName("내 정보 조회 성공")
   @Test
-  void User_Scrap() throws Exception  {
+  void Find_My_Info_Success() throws Exception {
     // given
-    final ScrapRequestDto requestDto = scrapDto();
+    final UserLoginRequestDto requestDto = loginDto();
+    when(userService.login(requestDto)).thenReturn(String.valueOf(new JwtResponseDto(null)));
 
     // when
-    ResultActions resultActions = requestUserScrap(requestDto);
+    ResultActions resultActions = requestPostLogin(requestDto);
 
     // then
-    resultActions.andExpect(status().isOk());
+    resultActions.andExpect(status().isOk())
+        .andExpect(jsonPath("$.accessToken").doesNotExist());
   }
 
+  @DisplayName("내 정보 조회 실패")
+  @Test
+  void Find_My_Info_Fail() throws Exception {
+    // given
+    final UserLoginRequestDto requestDto = loginDto();
+    when(userService.login(requestDto)).thenReturn(String.valueOf(new JwtResponseDto(null)));
+
+    // when
+    ResultActions resultActions = requestPostLogin(requestDto);
+
+    // then
+    resultActions.andExpect(status().isOk())
+        .andExpect(jsonPath("$.accessToken").doesNotExist());
+  }
+
+  @DisplayName("회원 회원가입 객체 생성")
   private UserSignUpRequestDto signUpDto(String type) {
     String userId = "userId";
     String password = "password";
     String name = "홍길동";
     String regNo = "860824-1655068";
+    String wrongRegNo = "6824-1655068";
 
     switch (type) {
       case "userId": userId = "";
@@ -194,46 +221,44 @@ class UserApiControllerTest {
         break;
       case "regNo": regNo = "";
         break;
+      case "wrongRegNo": regNo = wrongRegNo;
+        break;
     }
     return UserSignUpRequestDto.builder()
-        .userId(userId)
-        .password(password)
-        .name(name)
-        .regNo(regNo)
-        .build();
+                               .userId(userId)
+                               .password(password)
+                               .name(name)
+                               .regNo(regNo)
+                               .build();
   }
 
+  @DisplayName("회원 로그인 객체 생성")
   private UserLoginRequestDto loginDto() {
     return UserLoginRequestDto.builder()
-        .userId("userId")
-        .password("password")
-        .build();
+                              .userId("userId")
+                              .password("password")
+                              .build();
   }
 
-  private ScrapRequestDto scrapDto() {
-    return ScrapRequestDto.builder()
-        .name("홍길동")
-        .regNo("860824-1655068")
-        .build();
-  }
-
-  private ResultActions requestUserSaveDto(UserSignUpRequestDto requestDto) throws Exception {
+  @DisplayName("[POST] 회원가입")
+  private ResultActions requestPostSignUp(UserSignUpRequestDto requestDto) throws Exception {
     return mvc.perform(post("/api/szs/signup")
+              .content(objectMapper.writeValueAsString(requestDto))
+              .contentType(MediaType.APPLICATION_JSON));
+  }
+
+  @DisplayName("[GET] 회원가입")
+  private ResultActions requestGetSignUp(UserSignUpRequestDto requestDto) throws Exception {
+    return mvc.perform(get("/api/szs/signup")
         .content(objectMapper.writeValueAsString(requestDto))
         .contentType(MediaType.APPLICATION_JSON));
   }
 
-  private ResultActions requestUserLoginDto(UserLoginRequestDto requestDto) throws Exception {
+  @DisplayName("[POST] 로그인")
+  private ResultActions requestPostLogin(UserLoginRequestDto requestDto) throws Exception {
     return mvc.perform(post("/api/szs/login")
-        .content(objectMapper.writeValueAsString(requestDto))
-        .contentType(MediaType.APPLICATION_JSON));
+              .content(objectMapper.writeValueAsString(requestDto))
+              .contentType(MediaType.APPLICATION_JSON));
   }
-
-  private ResultActions requestUserScrap(ScrapRequestDto requestDto) throws Exception {
-    return mvc.perform(post("/api/szs/scrap")
-        .content(String.valueOf(requestDto))
-        .contentType(MediaType.APPLICATION_JSON));
-  }
-
 
 }

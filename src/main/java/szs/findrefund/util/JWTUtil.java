@@ -1,7 +1,6 @@
 package szs.findrefund.util;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static szs.findrefund.common.Constants.*;
+import static szs.findrefund.common.Constants.JwtConst.*;
 
 @Slf4j
 @Component
@@ -73,7 +72,7 @@ public class JWTUtil {
    */
   private static Map<String, Object> createClaims(User user) {
     Map<String, Object> claims = new HashMap<>();
-    claims.put(JwtConst.PK_ID, String.valueOf(user.getId()));
+    claims.put(PK_ID, String.valueOf(user.getId()));
     return claims;
   }
 
@@ -100,7 +99,7 @@ public class JWTUtil {
    */
   public static Long getIdFromToken(String jwt) {
     Claims claimsFromToken = getClaimsFromToken(jwt);
-    return Long.parseLong(String.valueOf(claimsFromToken.get(JwtConst.PK_ID)));
+    return Long.parseLong(String.valueOf(claimsFromToken.get(PK_ID)));
   }
 
   /**

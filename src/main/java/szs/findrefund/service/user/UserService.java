@@ -1,7 +1,6 @@
 package szs.findrefund.service.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,8 +33,8 @@ public class UserService {
   public UserSignUpResponseDto signUp(UserSignUpRequestDto requestDto) throws Exception {
 
     availableUsers(requestDto);
-    validateDuplicateUsers(requestDto);
-    String encryptRegNo = patternMatchesRegNo(requestDto);
+    validateDuplicateUsers(requestDto.getUserId());
+    String encryptRegNo = patternMatchesRegNo(requestDto.getRegNo());
     requestDto.encryptTheRegNo(encryptRegNo);
     requestDto.encryptThePassword(passwordEncoder.encode(requestDto.getPassword()));
 
@@ -46,11 +45,11 @@ public class UserService {
   /**
    * 주민등록번호 유효성 검사
    */
-  private String patternMatchesRegNo(UserSignUpRequestDto requestDto) throws Exception {
-    boolean matches = Pattern.matches(REGIST_REG_NO_RULE, requestDto.getRegNo());
+  private String patternMatchesRegNo(String regNo) throws Exception {
+    boolean matches = Pattern.matches(REGIST_REG_NO_RULE, regNo);
 
     if (matches) {
-      return encrypt(requestDto.getRegNo());
+      return encrypt(regNo);
     } else {
       throw new RegNoNotMatchException();
     }
@@ -67,8 +66,8 @@ public class UserService {
   /**
    * 중복회원 검사
    */
-  private void validateDuplicateUsers(UserSignUpRequestDto requestDto) {
-    userRepository.findByUserId(requestDto.getUserId())
+  private void validateDuplicateUsers(String userId) {
+    userRepository.findByUserId(userId)
                   .ifPresent(findUser -> {
                     throw new ValidDuplicatedUserException(UserExceptionEnum.VALIDATED_DUPLICATED_USERS);
                   });
@@ -94,8 +93,7 @@ public class UserService {
    * 내 정보 조회
    */
   @Transactional(readOnly = true)
-  public UserInfoResponseDto findMyInfo(String jwtToken) throws Exception {
-    Long idFromToken = JWTUtil.getIdFromToken(jwtToken);
+  public UserInfoResponseDto findMyInfo(Long idFromToken) throws Exception {
     User findUser = userRepository.findById(idFromToken)
                                   .orElseThrow(UserNotFoundException::new);
 
@@ -110,8 +108,7 @@ public class UserService {
    * URL 스크랩 위한 정보 조회
    */
   @Transactional(readOnly = true)
-  public ScrapRequestDto findMyInfoForUrlScrap(String jwtToken) throws Exception {
-    Long idFromToken = JWTUtil.getIdFromToken(jwtToken);
+  public ScrapRequestDto findMyInfoForUrlScrap(Long idFromToken) throws Exception {
     User findUser = userRepository.findById(idFromToken)
                                   .orElseThrow(UserNotFoundException::new);
 

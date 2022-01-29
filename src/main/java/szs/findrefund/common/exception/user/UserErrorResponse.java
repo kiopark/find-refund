@@ -12,7 +12,6 @@ public class UserErrorResponse {
   private String errorCode;
   private String msg;
 
-
   private UserErrorResponse(UserExceptionEnum userExceptionEnum) {
     this.errorCode = userExceptionEnum.getErrorCode();
     this.msg = userExceptionEnum.getMsg();
