@@ -6,19 +6,23 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import szs.findrefund.common.enums.CommonExceptionEnum;
+import szs.findrefund.common.exception.user.custom.UserNotFoundException;
 import szs.findrefund.service.user.UserService;
 import szs.findrefund.web.dto.jwt.JwtResponseDto;
+import szs.findrefund.web.dto.user.UserInfoResponseDto;
 import szs.findrefund.web.dto.user.UserLoginRequestDto;
 import szs.findrefund.web.dto.user.UserSignUpRequestDto;
 import szs.findrefund.web.dto.user.UserSignUpResponseDto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -174,34 +178,33 @@ class UserApiControllerTest {
     assertThat(accessToken).isNotEmpty();
   }
 
-  @DisplayName("내 정보 조회 성공")
-  @Test
-  void Find_My_Info_Success() throws Exception {
-    // given
-    final UserLoginRequestDto requestDto = loginDto();
-    when(userService.login(requestDto)).thenReturn(String.valueOf(new JwtResponseDto(null)));
-
-    // when
-    ResultActions resultActions = requestPostLogin(requestDto);
-
-    // then
-    resultActions.andExpect(status().isOk())
-        .andExpect(jsonPath("$.accessToken").doesNotExist());
-  }
-
   @DisplayName("내 정보 조회 실패")
   @Test
   void Find_My_Info_Fail() throws Exception {
     // given
-    final UserLoginRequestDto requestDto = loginDto();
-    when(userService.login(requestDto)).thenReturn(String.valueOf(new JwtResponseDto(null)));
+    final Long idFromToken = 1L;
+    final String accessToken = "accessToken";
+    given(userService.findMyInfo(idFromToken)).willThrow(new UserNotFoundException());
 
     // when
-    ResultActions resultActions = requestPostLogin(requestDto);
+    ResultActions resultActions = requestGetFindMe(accessToken);
 
     // then
-    resultActions.andExpect(status().isOk())
-        .andExpect(jsonPath("$.accessToken").doesNotExist());
+  }
+
+  @DisplayName("내 정보 조회 성공")
+  @Test
+  void Find_My_Info_Success() throws Exception {
+    // given
+    final Long idFromToken = 1L;
+    final String accessToken = "accessToken";
+    final UserInfoResponseDto requestDto = findUserDto();
+    given(userService.findMyInfo(idFromToken)).willReturn(requestDto);
+
+    // when
+    ResultActions resultActions = requestGetFindMe(accessToken);
+
+    // then
   }
 
   @DisplayName("회원 회원가입 객체 생성")
@@ -240,6 +243,15 @@ class UserApiControllerTest {
                               .build();
   }
 
+  @DisplayName("조회된 회원 객체 생성")
+  private UserInfoResponseDto findUserDto() {
+    return UserInfoResponseDto.builder()
+                              .userId("userId")
+                              .name("홍길동")
+                              .regNo("860824-1655068")
+                              .build();
+  }
+
   @DisplayName("[POST] 회원가입")
   private ResultActions requestPostSignUp(UserSignUpRequestDto requestDto) throws Exception {
     return mvc.perform(post("/api/szs/signup")
@@ -259,6 +271,12 @@ class UserApiControllerTest {
     return mvc.perform(post("/api/szs/login")
               .content(objectMapper.writeValueAsString(requestDto))
               .contentType(MediaType.APPLICATION_JSON));
+  }
+
+  @DisplayName("[GET] 내 정보 조회")
+  private ResultActions requestGetFindMe(String accessToken) throws Exception {
+    return mvc.perform(get("/api/szs/me")
+        .header(HttpHeaders.AUTHORIZATION, accessToken));
   }
 
 }

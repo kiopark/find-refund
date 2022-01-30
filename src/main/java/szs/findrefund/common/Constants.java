@@ -69,7 +69,7 @@ public class Constants {
     /*  */
     public static final String SPEC_NAME = "AES/CBC/PKCS5Padding";
     /*  */
-    public static final byte[] SPEC_KEY = "01234567890123456789012345678901".getBytes();
+    public static final byte[] SPEC_KEY = "aeskey12345678987654321234567898".getBytes();
     /*  */
     public static final byte[] IV = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
                                       0x09, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16 };

@@ -10,7 +10,7 @@ import java.util.*;
 @Getter
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @RequiredArgsConstructor
-public enum  AvailableUserEnum {
+public enum AvailableUserEnum {
 
   홍길동("홍길동", "860824-1655068"),
   김둘리("김둘리", "921108-1582816"),
