@@ -21,7 +21,7 @@
 * README 파일을 이용하여 요구사항 구현 여부, 구현 방법 그리고 검증 결과에 대해 작성
 
 ## 개발환경
-* Java 11 + Spring Boot 2.4.0
+* Java 8 + Spring Boot 2.4.0
 * H2 Embeded DB
 * Gradle 7.3.3
 * Spring Data JPA
@@ -30,11 +30,13 @@
 * IntelliJ
 
 ## API
+- **URL**
+  `POST https://codetest.3o3.co.kr/scrap/`
 
 ## 기능구현방법
 - **회원가입**
   - 아이디, 이름, 비밀번호, 주민등록번호 를 필수값으로 입력 받는다.
-  - Enum 타입(AvailableUserEnum) 으로 등록되어있는 회원의 정보로만 가입이 가능하다.
+  - `Enum` 타입(AvailableUserEnum) 으로 등록되어있는 회원의 정보로만 가입이 가능하다.
   
   ```java
   public enum AvailableUserEnum {
@@ -53,7 +55,7 @@
 - **로그인**
   - 아이디, 비밀번호를 입력받는다.
   - 아이디값으로 DB에 정보를 조회하여 비밀번호가 일치하는지 비교한다.
-  - 로그인에 성공하면 JWT 를 생성해 토큰값을 반환한다.
+  - 로그인에 성공하면 `JWT` 를 생성해 토큰값을 반환한다.
   
   ```java
   return ResponseEntity.ok().body(new JwtResponseDto(jwtToken));
@@ -62,7 +64,7 @@
 - **내 정보 조회**
   - JWT를 사용하여 회원을 식별하기 위해 HttpServeltRequest Header에 Authorization의 값으로 담는다.
   
-  ```java
+  ```html
   {
     Authorization: JWT Token
   }
@@ -74,9 +76,9 @@
 - **URL 스크랩**
   - 유효한 토큰인지 인증 작업을 한다.
   - WebClient 를 통해 URL 스크랩 [API](#API)를 호출한다.
-  - API 요청이후 최대20초 가량의 대기시간이 있어 각 스레드간의 Blocking방식의 처리가 [문제](#문제해결전략)가되었다.
-  - 또한, 대량의 트래픽이 발생할 경우 DB에 저장할 데이터 조회와 등록간의 데이터 꼬임 현상이 [문제](#문제해결전략)가 되었다.
-  - API를 통해 가져온 JSON 형태의 데이터를 ScrapResponseDto 매핑한다.
+  - API 요청이후 최대20초 가량의 대기시간이 있어 기존의 각 스레드간 Blocking방식처리에 [문제](#문제해결전략)가 있었다.
+  - 또한, 대량의 트래픽이 발생할 경우 DB에 저장할 데이터 조회와 등록간의 데이터 꼬임 현상이 발생하는 [문제](#문제해결전략)가 있었다.
+  - API를 통해 가져온 `JSON` 형태의 데이터를 `ScrapResponseDto` 매핑한다.
   - 매핑된 DTO 객체의 데이터를 분리한다.   
     IncomeDetail(소득상세정보), IncomeClassfication(소득구분정보), ScrapStatus(스크랩상태정보), ScrapLog(스크랩로그정보)
   - @OneToOne(연관관계의 주인 - Income)을 통해 각각의 DB에 데이터를 저장한다.
@@ -88,5 +90,9 @@
   - 조회된 데이터를 이용하여 한도액, 공제액, 환급액을 계산하여 반환한다.
 
 ## 문제해결전략
+  - Non-Blocking HTTP 요청을 위해 `WebClient`를 사용하여 요청후 [무작정 기다리며](#기능구현방법) 길어지는 응답시간을 해결하였다.
+  - Method Level 에서 @Cacheable 으로 특정값(id)을 캐싱처리하여 [동일한 동작](#기능구현방법)을 사전 방지하였다.
+  - 중복 저장을 방지하기위해 DB에 이미 동일한 회원의 정보가 존재하면 해당 데이터를 삭제 후 저장한다.
+  - WebClient의 `onStatus()` 체이닝을 이용하여 API의 에러 처리를 하였다.
 
 ## 주관식과제
