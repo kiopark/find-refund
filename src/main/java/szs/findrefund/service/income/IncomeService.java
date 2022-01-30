@@ -1,6 +1,10 @@
 package szs.findrefund.service.income;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,7 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import szs.findrefund.common.enums.DeductionAmountEnum;
 import szs.findrefund.common.enums.RefundAmountEnum;
-import szs.findrefund.common.exception.user.custom.UserNotFoundException;
+import szs.findrefund.common.exception.custom.ScrapLoadingException;
 import szs.findrefund.domain.income.Income;
 import szs.findrefund.domain.income.IncomeRepository;
 import szs.findrefund.domain.scrapLog.ScrapLog;
@@ -19,6 +23,7 @@ import szs.findrefund.web.dto.refund.RefundResponseDto;
 import szs.findrefund.web.dto.scrap.*;
 import szs.findrefund.web.dto.user.UserInfoResponseDto;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.Optional;
 
@@ -26,18 +31,37 @@ import static szs.findrefund.common.Constants.RefundConst.*;
 import static szs.findrefund.common.Constants.UrlConst.SCRAP_URL;
 import static szs.findrefund.util.AESCryptoUtil.encrypt;
 
-@Service
+@Slf4j
 @RequiredArgsConstructor
+@Service
 public class IncomeService {
 
   private final WebClient webClient;
   private final UserService userService;
   private final IncomeRepository incomeRepository;
+  private final ApplicationContext applicationContext;
+
+  /* 캐시 작동을 위한 self-invocation */
+  private IncomeService self;
+
+  @PostConstruct
+  private void init() {
+    self = (IncomeService) applicationContext.getBean("incomeService");
+  }
+
+  /**
+   * 환급액 조회 캐시 초기화 (self.clearCache 로 호출)
+   */
+  @CacheEvict(value = "accessToken", key = "#accessToken")
+  public void clearCache(String accessToken){
+    log.debug("환급액 조회 캐시 초기화");
+  }
 
   /**
    * 스크랩 한 유저 정보 저장
    */
   @Transactional
+  @Cacheable(value = "accessToken", key = "#accessToken")
   public void saveScrapData(String accessToken) throws Exception {
     userScrapApiCall(accessToken)
         .subscribe(responseDto -> {
@@ -51,6 +75,8 @@ public class IncomeService {
             incomeRepository.save(incomeInfo);
           } catch (Exception e) {
             e.printStackTrace();
+          } finally {
+            self.clearCache(accessToken);
           }
         });
   }
@@ -124,11 +150,14 @@ public class IncomeService {
    * 환급액 조회
    */
   @Transactional(readOnly = true)
-  public RefundResponseDto selectMyRefund(Long idFromToken) throws Exception {
+  public RefundResponseDto selectMyRefund(String accessToken) throws Exception {
+    Long idFromToken = JWTUtil.getIdFromToken(accessToken);
     UserInfoResponseDto myInfo = userService.findMyInfo(idFromToken);
     Income findIncome = incomeRepository.findByRegNo(encrypt(myInfo.getRegNo()))
-                                        .orElseThrow(UserNotFoundException::new);
-    return calcRefund(findIncome);
+                                        .orElseThrow(ScrapLoadingException::new);
+
+    RefundResponseDto refundResponseDto = calcRefund(findIncome);
+    return refundResponseDto;
   }
 
   /**

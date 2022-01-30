@@ -29,12 +29,12 @@ public class JWTUtil {
   @Value("${jwt.secret}")
   private String temp_secretKey;
 
-  private static String secretKey;
+  private static String secretKey = Base64.getEncoder().encodeToString("c3pzLWZpbmQtcmVmdW5kLWp3dC1zZWNyZXRrZXk".getBytes());
 
   @Value("${jwt.token-expire-seconds}")
   private long temp_expire_seconds;
 
-  private static long expire_seconds;
+  private static long expire_seconds = 864000000L;
 
   @PostConstruct
   protected void init() {

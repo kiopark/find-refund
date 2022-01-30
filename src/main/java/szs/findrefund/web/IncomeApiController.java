@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import szs.findrefund.service.income.IncomeService;
-import szs.findrefund.util.JWTUtil;
 import szs.findrefund.web.dto.refund.RefundResponseDto;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,8 +34,7 @@ public class IncomeApiController {
   @GetMapping("/refund")
   public ResponseEntity<RefundResponseDto> refund(HttpServletRequest request) throws Exception {
     String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-    Long idFromToken = JWTUtil.getIdFromToken(jwtToken);
-    return ResponseEntity.ok().body(incomeService.selectMyRefund(idFromToken));
+    return ResponseEntity.ok().body(incomeService.selectMyRefund(jwtToken));
   }
 
 }

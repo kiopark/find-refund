@@ -61,7 +61,7 @@ class IncomeApiControllerTest {
     // given
     final String uri = "refund";
     final String accessToken = "accessToken";
-    given(incomeService.selectMyRefund(any())).willReturn(requestDto());
+    given(incomeService.selectMyRefund(any())).willReturn(responseDto());
 
     // when
     ResultActions resultActions = requestGetAccessToken(accessToken, uri);
@@ -81,7 +81,7 @@ class IncomeApiControllerTest {
     // given
     final String uri = "refund";
     final String accessToken = "accessToken";
-    given(incomeService.selectMyRefund(any())).willReturn(requestDto());
+    given(incomeService.selectMyRefund(any())).willReturn(responseDto());
 
     // when
     ResultActions resultActions = requestPostAccessToken(accessToken, uri);
@@ -94,7 +94,7 @@ class IncomeApiControllerTest {
   }
 
   @DisplayName("회원 회원가입 객체 생성")
-  private RefundResponseDto requestDto() {
+  private RefundResponseDto responseDto() {
     return RefundResponseDto.builder()
                             .name("홍길동")
                             .limitAmount(MIN_PAYMENT_AMOUNT)

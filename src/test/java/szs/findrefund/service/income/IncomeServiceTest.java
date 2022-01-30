@@ -6,16 +6,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import szs.findrefund.common.exception.user.custom.UserNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
+import szs.findrefund.common.exception.custom.ScrapLoadingException;
 import szs.findrefund.domain.income.Income;
 import szs.findrefund.domain.income.IncomeRepository;
 import szs.findrefund.domain.scrapLog.ScrapLog;
 import szs.findrefund.domain.scrapStatus.ScrapStatus;
 import szs.findrefund.service.user.UserService;
-import szs.findrefund.util.AESCryptoUtil;
 import szs.findrefund.web.dto.refund.RefundResponseDto;
 import szs.findrefund.web.dto.scrap.IncomeClassficationDto;
 import szs.findrefund.web.dto.scrap.IncomeDetailDto;
+import szs.findrefund.web.dto.scrap.ScrapRequestDto;
+import szs.findrefund.web.dto.scrap.ScrapResponseDto;
 import szs.findrefund.web.dto.user.UserInfoResponseDto;
 
 import java.lang.reflect.Method;
@@ -28,6 +34,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static szs.findrefund.common.Constants.RefundConst.*;
+import static szs.findrefund.common.Constants.UrlConst.SCRAP_URL;
+import static szs.findrefund.util.AESCryptoUtil.encrypt;
 
 @ExtendWith(MockitoExtension.class)
 class IncomeServiceTest {
@@ -41,58 +49,72 @@ class IncomeServiceTest {
   @Mock
   private IncomeRepository incomeRepository;
 
+  @Autowired
+  private WebTestClient webTestClient;
+
   private final LocalDateTime ResDt = LocalDateTime.of(2022,12,1,2,24,0);
   private final LocalDateTime ReqDt = LocalDateTime.of(2022,12,1,2,24,59);
 
-//  @DisplayName("[URL 스크랩 결과 정보] Entity 매칭")
-//  @Test
-//  void Dto_Match_Entity() throws Exception {
-//
-//    // given
-//    final ScrapResponseDto scrapDto = scrapDto();
-//
-//    // when
-//    Method privateMethod = incomeService.getClass()
-//        .getDeclaredMethod("dtoMatchEntity", ScrapResponseDto.class);
-//
-//    privateMethod.setAccessible(true);
-//    Object methodResult = privateMethod.invoke(incomeService, scrapDto);
-//
-//    // then
-//    assertThat(methodResult).isNull();
-//  }
+  @DisplayName("URL 스크랩 API WebClient 호출")
+  @Test
+  void URL_Scrap_Api_Call_Of_WebClient() throws Exception {
+
+    // given
+    final String accessToken = "eyJyZWdEYXRlIjoxNjQzNTI0OTUyMDM1LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEiLCJpYXQiOjE2NDM1MjQ5NTIsImV4cCI6MTY0NDM4ODk1Mn0.M3kYZE7TULLg4yYZSTlB4soED2o_Rl_zBgJJwF_8VOI";
+    ScrapRequestDto scrapRequestDto = scrapDto();
+    given(userService.findMyInfoForUrlScrap(1L)).willReturn(scrapRequestDto);
+
+    webTestClient.method(HttpMethod.POST)
+                       .uri(SCRAP_URL)
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .accept(MediaType.APPLICATION_JSON)
+                       .bodyValue(scrapRequestDto)
+                       .exchange()
+                       .expectBody()
+                       .consumeWith(result -> {
+                         System.out.println(result.getResponseHeaders());
+                         System.out.println(result.getResponseBody());
+                       });
+
+    // when
+    Mono<ScrapResponseDto> scrapResponseDtoMono = incomeService.userScrapApiCall(accessToken);
+
+    // then
+    System.out.println("scrapResponseDtoMono = " + scrapResponseDtoMono);
+
+  }
 
   @DisplayName("환급액 조회 실패")
   @Test
   void Find_Refund_Fail() throws Exception {
     // given
-    final Long fakeId = 1L;
+    final String accessToken = "eyJyZWdEYXRlIjoxNjQzNTI0OTUyMDM1LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEiLCJpYXQiOjE2NDM1MjQ5NTIsImV4cCI6MTY0NDM4ODk1Mn0.M3kYZE7TULLg4yYZSTlB4soED2o_Rl_zBgJJwF_8VOI";
     final UserInfoResponseDto userDto = userDto();
     given(userService.findMyInfo(any())).willReturn(userDto);
-    given(incomeRepository.findByRegNo(AESCryptoUtil.encrypt(userDto.getRegNo())))
-                          .willThrow(new UserNotFoundException());
+    given(incomeRepository.findByRegNo(encrypt(userDto.getRegNo())))
+                          .willThrow(new ScrapLoadingException());
 
     // when
 
     // then
-    assertThatExceptionOfType(UserNotFoundException.class)
-        .isThrownBy(() -> incomeService.selectMyRefund(fakeId));
+    assertThatExceptionOfType(ScrapLoadingException.class)
+        .isThrownBy(() -> incomeService.selectMyRefund(accessToken));
   }
 
   @DisplayName("환급액 조회 성공")
   @Test
   void Find_Refund_Success() throws Exception {
     // given
-    final Long fakeId = 1L;
+    final String accessToken = "eyJyZWdEYXRlIjoxNjQzNTI0OTUyMDM1LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEiLCJpYXQiOjE2NDM1MjQ5NTIsImV4cCI6MTY0NDM4ODk1Mn0.M3kYZE7TULLg4yYZSTlB4soED2o_Rl_zBgJJwF_8VOI";
     final BigDecimal amount = BigDecimal.valueOf(2000000);
     final Income incomDto = incomDto();
     final UserInfoResponseDto userDto = userDto();
     given(userService.findMyInfo(any())).willReturn(userDto);
-    given(incomeRepository.findByRegNo(AESCryptoUtil.encrypt(userDto.getRegNo())))
+    given(incomeRepository.findByRegNo(encrypt(userDto.getRegNo())))
                           .willReturn(Optional.ofNullable(incomDto));
 
     // when
-    RefundResponseDto myRefund = incomeService.selectMyRefund(fakeId);
+    RefundResponseDto myRefund = incomeService.selectMyRefund(accessToken);
 
     // then
     assertThat(myRefund.getName()).isEqualTo(userDto.getName());
@@ -228,16 +250,13 @@ class IncomeServiceTest {
     assertThat(methodResult).isEqualTo(MIN_REFUND_AMOUNT);
   }
 
-//  @DisplayName("스크랩한 객체 생성")
-//  private ScrapResponseDto scrapDto() {
-//    return ScrapResponseDto.builder()
-//                           .jsonList()
-//                           .appVer()
-//                           .hostNm()
-//                           .workerReqDt()
-//                           .workerResDt()
-//                           .build();
-//  }
+  @DisplayName("스크랩한 객체 생성")
+  private ScrapRequestDto scrapDto() {
+    return ScrapRequestDto.builder()
+                          .name("홍길동")
+                          .regNo("860824-1655068")
+                          .build();
+  }
 
   @DisplayName("회원 객체 생성")
   private UserInfoResponseDto userDto() {

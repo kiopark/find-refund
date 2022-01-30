@@ -12,6 +12,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import szs.findrefund.common.enums.CommonExceptionEnum;
+import szs.findrefund.common.enums.JwtExceptionEnum;
+import szs.findrefund.common.enums.UserExceptionEnum;
 import szs.findrefund.common.exception.user.custom.UserNotFoundException;
 import szs.findrefund.service.user.UserService;
 import szs.findrefund.web.dto.jwt.JwtResponseDto;
@@ -21,7 +23,7 @@ import szs.findrefund.web.dto.user.UserSignUpRequestDto;
 import szs.findrefund.web.dto.user.UserSignUpResponseDto;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -43,7 +45,7 @@ class UserApiControllerTest {
   void SignUp_Fail_UserId_Blank() throws Exception {
     // given
     final UserSignUpRequestDto requestDto = signUpDto("userId");
-    when(userService.signUp(requestDto)).thenReturn(new UserSignUpResponseDto());
+    given(userService.signUp(requestDto)).willReturn(new UserSignUpResponseDto());
 
     // when
     ResultActions resultActions = requestPostSignUp(requestDto);
@@ -59,7 +61,7 @@ class UserApiControllerTest {
   void SignUp_Fail_Password_Blank() throws Exception {
     // given
     final UserSignUpRequestDto requestDto = signUpDto("password");
-    when(userService.signUp(requestDto)).thenReturn(new UserSignUpResponseDto());
+    given(userService.signUp(requestDto)).willReturn(new UserSignUpResponseDto());
 
     // when
     ResultActions resultActions = requestPostSignUp(requestDto);
@@ -75,7 +77,7 @@ class UserApiControllerTest {
   void SignUp_Fail_Name_Blank() throws Exception {
     // given
     final UserSignUpRequestDto requestDto = signUpDto("name");
-    when(userService.signUp(requestDto)).thenReturn(new UserSignUpResponseDto());
+    given(userService.signUp(requestDto)).willReturn(new UserSignUpResponseDto());
 
     // when
     ResultActions resultActions = requestPostSignUp(requestDto);
@@ -91,7 +93,7 @@ class UserApiControllerTest {
   void SignUp_Fail_RegNo_Blank() throws Exception {
     // given
     final UserSignUpRequestDto requestDto = signUpDto("regNo");
-    when(userService.signUp(requestDto)).thenReturn(new UserSignUpResponseDto());
+    given(userService.signUp(requestDto)).willReturn(new UserSignUpResponseDto());
 
     // when
     ResultActions resultActions = requestPostSignUp(requestDto);
@@ -107,7 +109,7 @@ class UserApiControllerTest {
   void SignUp_Not_Allowed_Method() throws Exception {
     // given
     final UserSignUpRequestDto requestDto = signUpDto("");
-    when(userService.signUp(requestDto)).thenReturn(new UserSignUpResponseDto());
+    given(userService.signUp(requestDto)).willReturn(new UserSignUpResponseDto());
 
     // when
     ResultActions resultActions = requestGetSignUp(requestDto);
@@ -123,7 +125,7 @@ class UserApiControllerTest {
   void SignUp_Success() throws Exception {
     // given
     final UserSignUpRequestDto requestDto = signUpDto("");
-    when(userService.signUp(requestDto)).thenReturn(new UserSignUpResponseDto());
+    given(userService.signUp(requestDto)).willReturn(new UserSignUpResponseDto());
 
     // when
     ResultActions resultActions = requestPostSignUp(requestDto);
@@ -137,7 +139,7 @@ class UserApiControllerTest {
   void Login_Fail_UserId_Blank() throws Exception {
     // given
     final UserLoginRequestDto requestDto = loginDto();
-    when(userService.login(requestDto)).thenReturn(String.valueOf(new JwtResponseDto(null)));
+    given(userService.login(requestDto)).willReturn(String.valueOf(new JwtResponseDto(null)));
 
     // when
     ResultActions resultActions = requestPostLogin(requestDto);
@@ -152,7 +154,7 @@ class UserApiControllerTest {
   void Login_Fail_Password_Blank() throws Exception {
     // given
     final UserLoginRequestDto requestDto = loginDto();
-    when(userService.login(requestDto)).thenReturn(String.valueOf(new JwtResponseDto(null)));
+    given(userService.login(requestDto)).willReturn(String.valueOf(new JwtResponseDto(null)));
 
     // when
     ResultActions resultActions = requestPostLogin(requestDto);
@@ -167,7 +169,7 @@ class UserApiControllerTest {
   void Login_Success() throws Exception {
     // given
     final UserLoginRequestDto requestDto = loginDto();
-    when(userService.login(requestDto)).thenReturn(String.valueOf(new JwtResponseDto(null)));
+    given(userService.login(requestDto)).willReturn(String.valueOf(new JwtResponseDto(null)));
 
     // when
     ResultActions resultActions = requestPostLogin(requestDto);
@@ -178,26 +180,28 @@ class UserApiControllerTest {
     assertThat(accessToken).isNotEmpty();
   }
 
-  @DisplayName("내 정보 조회 실패")
+  @DisplayName("[회원 없음] 내 정보 조회 실패")
   @Test
   void Find_My_Info_Fail() throws Exception {
     // given
     final Long idFromToken = 1L;
-    final String accessToken = "accessToken";
+    final String accessToken = "eyJyZWdEYXRlIjoxNjQzNTI0OTUyMDM1LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEiLCJpYXQiOjE2NDM1MjQ5NTIsImV4cCI6MTY0NDM4ODk1Mn0.M3kYZE7TULLg4yYZSTlB4soED2o_Rl_zBgJJwF_8VOI";
     given(userService.findMyInfo(idFromToken)).willThrow(new UserNotFoundException());
 
     // when
     ResultActions resultActions = requestGetFindMe(accessToken);
 
     // then
+    resultActions.andExpect(status().isBadRequest())
+                 .andExpect(jsonPath("msg").value(UserExceptionEnum.USER_NOT_FOUND.getMsg()));
   }
 
-  @DisplayName("내 정보 조회 성공")
+  @DisplayName("[존재하지 않는 토큰] 내 정보 조회 실패")
   @Test
-  void Find_My_Info_Success() throws Exception {
+  void Find_My_Info_Token_Fail() throws Exception {
     // given
     final Long idFromToken = 1L;
-    final String accessToken = "accessToken";
+    final String accessToken = "";
     final UserInfoResponseDto requestDto = findUserDto();
     given(userService.findMyInfo(idFromToken)).willReturn(requestDto);
 
@@ -205,9 +209,30 @@ class UserApiControllerTest {
     ResultActions resultActions = requestGetFindMe(accessToken);
 
     // then
+    resultActions.andExpect(status().isBadRequest())
+                 .andExpect(jsonPath("msg").value(JwtExceptionEnum.TOKEN_IS_NULL.getMsg()));
   }
 
-  @DisplayName("회원 회원가입 객체 생성")
+  @DisplayName("내 정보 조회 성공")
+  @Test
+  void Find_My_Info_Success() throws Exception {
+    // given
+    final Long idFromToken = 1L;
+    final String accessToken = "eyJyZWdEYXRlIjoxNjQzNTI0OTUyMDM1LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEiLCJpYXQiOjE2NDM1MjQ5NTIsImV4cCI6MTY0NDM4ODk1Mn0.M3kYZE7TULLg4yYZSTlB4soED2o_Rl_zBgJJwF_8VOI";
+    final UserInfoResponseDto requestDto = findUserDto();
+    given(userService.findMyInfo(idFromToken)).willReturn(requestDto);
+
+    // when
+    ResultActions resultActions = requestGetFindMe(accessToken);
+
+    // then
+    resultActions.andExpect(status().isOk())
+                 .andExpect(jsonPath("$.userId", is("userId")))
+                 .andExpect(jsonPath("$.name", is("홍길동")))
+                 .andExpect(jsonPath("$.regNo", is("860824-1655068")));
+  }
+
+  @DisplayName("회원가입 객체 생성")
   private UserSignUpRequestDto signUpDto(String type) {
     String userId = "userId";
     String password = "password";

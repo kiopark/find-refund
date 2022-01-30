@@ -3,11 +3,13 @@ package szs.findrefund.web.dto.scrap;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import szs.findrefund.domain.incomeClassfication.IncomeClassfication;
 
 import java.math.BigDecimal;
 
 @Getter
+@NoArgsConstructor
 public class IncomeClassficationDto {
 
   @JsonProperty(value = "소득구분")

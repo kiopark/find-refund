@@ -3,11 +3,12 @@ package szs.findrefund.web.dto.scrap;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
-import szs.findrefund.domain.income.Income;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Getter
+@NoArgsConstructor
 public class IncomeDetailDto {
 
   @JsonProperty("소득내역")
@@ -41,7 +42,6 @@ public class IncomeDetailDto {
   private String enterpriseRegNo;
 
   @Builder
-
   public IncomeDetailDto(String incomeType, BigDecimal totalPaymentAmount, String businessStartDate,
                          String enterpriseName, String userName, String regNo, String paymentDate,
                          String businessEndDate, String incomeDivision, String enterpriseRegNo) {
