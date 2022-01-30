@@ -54,12 +54,6 @@ public class Constants {
   public static final class JwtConst {
     /*  */
     public static final String PK_ID = "id";
-    /*  */
-    public static final String USER_ID = "userId";
-    /*  */
-    public static final String NAME = "name";
-    /*  */
-    public static final String REG_NO = "regNo";
   }
 
   /**

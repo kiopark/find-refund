@@ -14,6 +14,7 @@ import szs.findrefund.util.JWTUtil;
 import szs.findrefund.web.dto.scrap.ScrapRequestDto;
 import szs.findrefund.web.dto.user.*;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static szs.findrefund.common.Constants.PatternConst.REGIST_REG_NO_RULE;
@@ -33,7 +34,7 @@ public class UserService {
   public UserSignUpResponseDto signUp(UserSignUpRequestDto requestDto) throws Exception {
 
     availableUsers(requestDto);
-    validateDuplicateUsers(requestDto.getUserId());
+    validateDuplicateUsers(requestDto);
     String encryptRegNo = patternMatchesRegNo(requestDto.getRegNo());
     requestDto.encryptTheRegNo(encryptRegNo);
     requestDto.encryptThePassword(passwordEncoder.encode(requestDto.getPassword()));
@@ -66,9 +67,14 @@ public class UserService {
   /**
    * 중복회원 검사
    */
-  private void validateDuplicateUsers(String userId) {
-    userRepository.findByUserId(userId)
-                  .ifPresent(findUser -> {
+  private void validateDuplicateUsers(UserSignUpRequestDto requestDto) throws Exception {
+    userRepository.findByUserId(requestDto.getUserId())
+                  .ifPresent(user -> {
+                    throw new ValidDuplicatedUserException(UserExceptionEnum.VALIDATED_DUPLICATED_USERS);
+                  });
+
+    userRepository.findByRegNo(encrypt(requestDto.getRegNo()))
+                  .ifPresent(user -> {
                     throw new ValidDuplicatedUserException(UserExceptionEnum.VALIDATED_DUPLICATED_USERS);
                   });
   }

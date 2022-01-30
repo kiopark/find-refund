@@ -35,34 +35,56 @@ class UserServiceTest {
 
   @DisplayName("[아이디 중복] 유효성 검사 실패")
   @Test
-  void Validate_Duplicate_Fail() throws Exception {
+  void Validate_Duplicate_Fail_By_UserId() throws Exception {
     // given
-    final User requestUserDto = userDto();
-    final String fakeUserId = "userId";
-    doReturn(Optional.ofNullable(requestUserDto)).when(userRepository).findByUserId(fakeUserId);
+    final String fakeRegNo = "921108-1582816";
+    final UserSignUpRequestDto requestDto = signUpDto();
+    doReturn(Optional.empty()).when(userRepository).findByUserId(requestDto.getUserId());
+    doReturn(Optional.empty()).when(userRepository).findByRegNo(encrypt(fakeRegNo));
 
     // when
     Method privateMethod = userService.getClass()
-                                      .getDeclaredMethod("validateDuplicateUsers", String.class);
+                                      .getDeclaredMethod("validateDuplicateUsers", UserSignUpRequestDto.class);
     privateMethod.setAccessible(true);
 
     // then
     assertThatExceptionOfType(InvocationTargetException.class)
-        .isThrownBy(() -> privateMethod.invoke(userService, fakeUserId));
+        .isThrownBy(() -> privateMethod.invoke(userService, requestDto));
   }
 
-  @DisplayName("[아이디 사용가능] 유효성 검사 성공")
+  @DisplayName("[주민등록번호 중복] 유효성 검사 실패")
   @Test
-  void Validate_Duplicate_Success() throws Exception {
+  void Validate_Duplicate_Fail_By_RegNo() throws Exception {
     // given
-    final String fakeUserId = "userId";
+    final String fakeUserId = "fakeUserId";
+    final UserSignUpRequestDto requestDto = signUpDto();
     doReturn(Optional.empty()).when(userRepository).findByUserId(fakeUserId);
+    doReturn(Optional.empty()).when(userRepository).findByRegNo(encrypt(requestDto.getRegNo()));
 
     // when
     Method privateMethod = userService.getClass()
-                                      .getDeclaredMethod("validateDuplicateUsers", String.class);
+        .getDeclaredMethod("validateDuplicateUsers", UserSignUpRequestDto.class);
     privateMethod.setAccessible(true);
-    Object methodResult = privateMethod.invoke(userService, fakeUserId);
+
+    // then
+    assertThatExceptionOfType(InvocationTargetException.class)
+        .isThrownBy(() -> privateMethod.invoke(userService, requestDto));
+  }
+
+  @DisplayName("[회원정보 사용가능] 유효성 검사 성공")
+  @Test
+  void Validate_Duplicate_Success() throws Exception {
+    // given
+    final UserSignUpRequestDto requestDto = signUpDto();
+    doReturn(Optional.empty()).when(userRepository).findByUserId(requestDto.getUserId());
+    doReturn(Optional.empty()).when(userRepository).findByRegNo(encrypt(requestDto.getRegNo()));
+
+    // when
+    Method privateMethod = userService.getClass()
+                                      .getDeclaredMethod("validateDuplicateUsers", UserSignUpRequestDto.class);
+
+    privateMethod.setAccessible(true);
+    Object methodResult = privateMethod.invoke(userService, requestDto);
 
     // then
     assertThat(methodResult).isNull();
@@ -120,7 +142,7 @@ class UserServiceTest {
   @Test
   void Available_User() throws Exception {
     // given
-    final UserSignUpRequestDto requestDto = encryptRegNoDto();
+    final UserSignUpRequestDto requestDto = signUpDto();
 
     // when
     Method privateMethod = userService.getClass()
@@ -205,27 +227,17 @@ class UserServiceTest {
   }
 
   @DisplayName("회원가입 객체 생성 - 주민등록번호 암호화 전")
-  private UserSignUpRequestDto signUpDto() throws Exception {
+  private UserSignUpRequestDto signUpDto() {
     return UserSignUpRequestDto.builder()
                .userId("userId")
                .password("password")
                .name("홍길동")
-               .regNo(encrypt("860824-1655068"))
+               .regNo("860824-1655068")
                .build();
   }
 
-  @DisplayName("회원가입 객체 생성 - 주민등록번호 암호화 후")
-  private UserSignUpRequestDto encryptRegNoDto() throws Exception {
-    return UserSignUpRequestDto.builder()
-        .userId("userId")
-        .password("password")
-        .name("홍길동")
-        .regNo("860824-1655068")
-        .build();
-  }
-
   @DisplayName("가입 불가능한 객체 생성")
-  private UserSignUpRequestDto impossibleSignUpDto() throws Exception {
+  private UserSignUpRequestDto impossibleSignUpDto() {
     return UserSignUpRequestDto.builder()
         .userId("userId")
         .password("password")
