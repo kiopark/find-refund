@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import szs.findrefund.domain.BaseTimeEntity;
+import szs.findrefund.domain.BaseEntity;
 import szs.findrefund.domain.incomeClassfication.IncomeClassfication;
 import szs.findrefund.domain.scrapLog.ScrapLog;
 import szs.findrefund.domain.scrapStatus.ScrapStatus;
@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Income extends BaseTimeEntity {
+public class Income extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

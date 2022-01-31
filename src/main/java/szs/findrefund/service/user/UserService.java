@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import szs.findrefund.common.enums.AvailableUserEnum;
 import szs.findrefund.common.enums.SignUpEnum;
-import szs.findrefund.common.enums.UserExceptionEnum;
 import szs.findrefund.common.exception.user.custom.*;
 import szs.findrefund.domain.user.User;
 import szs.findrefund.domain.user.UserRepository;
@@ -14,7 +13,6 @@ import szs.findrefund.util.JWTUtil;
 import szs.findrefund.web.dto.scrap.ScrapRequestDto;
 import szs.findrefund.web.dto.user.*;
 
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static szs.findrefund.common.Constants.PatternConst.REGIST_REG_NO_RULE;
@@ -70,12 +68,12 @@ public class UserService {
   private void validateDuplicateUsers(UserSignUpRequestDto requestDto) throws Exception {
     userRepository.findByUserId(requestDto.getUserId())
                   .ifPresent(user -> {
-                    throw new ValidDuplicatedUserException(UserExceptionEnum.VALIDATED_DUPLICATED_USERS);
+                    throw new ValidDuplicatedIdException();
                   });
 
     userRepository.findByRegNo(encrypt(requestDto.getRegNo()))
                   .ifPresent(user -> {
-                    throw new ValidDuplicatedUserException(UserExceptionEnum.VALIDATED_DUPLICATED_USERS);
+                    throw new ValidDuplicatedUserException();
                   });
   }
 

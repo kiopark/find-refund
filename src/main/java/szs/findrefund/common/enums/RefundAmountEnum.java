@@ -1,5 +1,6 @@
 package szs.findrefund.common.enums;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -9,6 +10,7 @@ import java.util.Optional;
 import static szs.findrefund.common.Constants.RefundConst.*;
 
 @Getter
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @RequiredArgsConstructor
 public enum RefundAmountEnum {
 

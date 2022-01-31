@@ -3,7 +3,6 @@ package szs.findrefund.common.exception.user;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import szs.findrefund.common.enums.UserExceptionEnum;
@@ -18,7 +17,7 @@ public class UserExceptionHandler {
    */
   @ExceptionHandler(UserNotFoundException.class)
   protected ResponseEntity<UserErrorResponse> handleUserNotFoundException(UserNotFoundException e) {
-    log.error("handleUserNotFoundException", UserExceptionEnum.USER_NOT_FOUND.getMsg());
+    log.error("handleUserNotFoundException: {}", UserExceptionEnum.USER_NOT_FOUND.getMsg());
     UserErrorResponse userErrorResponse = UserErrorResponse.of(UserExceptionEnum.USER_NOT_FOUND);
     return new ResponseEntity<>(userErrorResponse, HttpStatus.BAD_REQUEST);
   }
@@ -28,18 +27,28 @@ public class UserExceptionHandler {
    */
   @ExceptionHandler(NonAvailableUserException.class)
   protected ResponseEntity<UserErrorResponse> handleNonAvailableUserException(NonAvailableUserException e) {
-    log.error("handleNonAvailableUserException", UserExceptionEnum.NON_AVAILABLE_USER.getMsg());
+    log.error("handleNonAvailableUserException: {}", UserExceptionEnum.NON_AVAILABLE_USER.getMsg());
     UserErrorResponse userErrorResponse = UserErrorResponse.of(UserExceptionEnum.NON_AVAILABLE_USER);
     return new ResponseEntity<>(userErrorResponse, HttpStatus.BAD_REQUEST);
   }
 
   /**
-   * 회원가입시 이미 존재하는 가입정보 일 경우 발생
+   * 회원가입시 이미 존재하는 회원 일 경우 발생
    */
   @ExceptionHandler(ValidDuplicatedUserException.class)
   protected ResponseEntity<UserErrorResponse> handleValidDuplicatedUserException(ValidDuplicatedUserException e) {
-    log.error("handleValidDuplicatedUserException", UserExceptionEnum.VALIDATED_DUPLICATED_USERS.getMsg());
+    log.error("handleValidDuplicatedUserException: {}", UserExceptionEnum.VALIDATED_DUPLICATED_USERS.getMsg());
     UserErrorResponse userErrorResponse = UserErrorResponse.of(UserExceptionEnum.VALIDATED_DUPLICATED_USERS);
+    return new ResponseEntity<>(userErrorResponse, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * 회원가입시 이미 존재하는 아이디 일 경우 발생
+   */
+  @ExceptionHandler(ValidDuplicatedIdException.class)
+  protected ResponseEntity<UserErrorResponse> handleValidDuplicatedIdException(ValidDuplicatedIdException e) {
+    log.error("handleValidDuplicatedIdException: {}", UserExceptionEnum.VALIDATED_DUPLICATED_ID.getMsg());
+    UserErrorResponse userErrorResponse = UserErrorResponse.of(UserExceptionEnum.VALIDATED_DUPLICATED_ID);
     return new ResponseEntity<>(userErrorResponse, HttpStatus.BAD_REQUEST);
   }
 
@@ -48,7 +57,7 @@ public class UserExceptionHandler {
    */
   @ExceptionHandler(PassWordNotMatchException.class)
   protected ResponseEntity<UserErrorResponse> handlePasswordNotMatchException(PassWordNotMatchException e) {
-    log.error("handlePasswordNotMatchException", UserExceptionEnum.PASSWORD_NOT_MATCHED.getMsg());
+    log.error("handlePasswordNotMatchException: {}", UserExceptionEnum.PASSWORD_NOT_MATCHED.getMsg());
     UserErrorResponse userErrorResponse = UserErrorResponse.of(UserExceptionEnum.PASSWORD_NOT_MATCHED);
     return new ResponseEntity<>(userErrorResponse, HttpStatus.BAD_REQUEST);
   }
@@ -58,7 +67,7 @@ public class UserExceptionHandler {
    */
   @ExceptionHandler(RegNoNotMatchException.class)
   protected ResponseEntity<UserErrorResponse> handleRegNoNotMatchException(RegNoNotMatchException e) {
-    log.error("handleRegNoNotMatchException", UserExceptionEnum.REGNO_NOT_MATCHED.getMsg());
+    log.error("handleRegNoNotMatchException: {}", UserExceptionEnum.REGNO_NOT_MATCHED.getMsg());
     UserErrorResponse userErrorResponse = UserErrorResponse.of(UserExceptionEnum.REGNO_NOT_MATCHED);
     return new ResponseEntity<>(userErrorResponse, HttpStatus.BAD_REQUEST);
   }

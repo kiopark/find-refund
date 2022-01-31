@@ -4,14 +4,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import szs.findrefund.domain.BaseTimeEntity;
+import szs.findrefund.domain.BaseEntity;
 
 import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class ScrapStatus extends BaseTimeEntity {
+public class ScrapStatus extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

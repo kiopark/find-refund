@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -16,6 +17,7 @@ import szs.findrefund.common.enums.JwtExceptionEnum;
 import szs.findrefund.common.enums.UserExceptionEnum;
 import szs.findrefund.common.exception.user.custom.UserNotFoundException;
 import szs.findrefund.service.user.UserService;
+import szs.findrefund.util.JWTUtil;
 import szs.findrefund.web.dto.jwt.JwtResponseDto;
 import szs.findrefund.web.dto.user.UserInfoResponseDto;
 import szs.findrefund.web.dto.user.UserLoginRequestDto;
@@ -27,12 +29,17 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static szs.findrefund.common.Constants.JwtConst.FAKE_ACCESS_TOKEN;
+import static szs.findrefund.common.Constants.JwtConst.FAKE_SECRET_KEY;
 
 @WebMvcTest(UserApiController.class)
 class UserApiControllerTest {
 
   @MockBean
   private UserService userService;
+
+  @MockBean
+  private JWTUtil jwtUtil;
 
   @Autowired
   private MockMvc mvc;
@@ -185,7 +192,7 @@ class UserApiControllerTest {
   void Find_My_Info_Fail() throws Exception {
     // given
     final Long idFromToken = 1L;
-    final String accessToken = "eyJyZWdEYXRlIjoxNjQzNTI0OTUyMDM1LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEiLCJpYXQiOjE2NDM1MjQ5NTIsImV4cCI6MTY0NDM4ODk1Mn0.M3kYZE7TULLg4yYZSTlB4soED2o_Rl_zBgJJwF_8VOI";
+    final String accessToken = FAKE_ACCESS_TOKEN;
     given(userService.findMyInfo(idFromToken)).willThrow(new UserNotFoundException());
 
     // when
@@ -206,6 +213,7 @@ class UserApiControllerTest {
     given(userService.findMyInfo(idFromToken)).willReturn(requestDto);
 
     // when
+    ReflectionTestUtils.setField(jwtUtil, "secretKey", FAKE_SECRET_KEY);
     ResultActions resultActions = requestGetFindMe(accessToken);
 
     // then
@@ -218,11 +226,12 @@ class UserApiControllerTest {
   void Find_My_Info_Success() throws Exception {
     // given
     final Long idFromToken = 1L;
-    final String accessToken = "eyJyZWdEYXRlIjoxNjQzNTI0OTUyMDM1LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEiLCJpYXQiOjE2NDM1MjQ5NTIsImV4cCI6MTY0NDM4ODk1Mn0.M3kYZE7TULLg4yYZSTlB4soED2o_Rl_zBgJJwF_8VOI";
+    final String accessToken = FAKE_ACCESS_TOKEN;
     final UserInfoResponseDto requestDto = findUserDto();
     given(userService.findMyInfo(idFromToken)).willReturn(requestDto);
 
     // when
+    ReflectionTestUtils.setField(jwtUtil, "secretKey", FAKE_SECRET_KEY);
     ResultActions resultActions = requestGetFindMe(accessToken);
 
     // then

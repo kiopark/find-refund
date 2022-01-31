@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum IncomeExceptionEnum {
 
-  SCRAP_LOADING_EXCEPTION("S001","정보를 불러오는 중 입니다. 잠시만 기다려주세요.");
+  SCRAP_LOADING_EXCEPTION("I001","정보를 불러오는 중 입니다. 잠시만 기다려주세요.");
 
   private final String errorCode;
   private final String msg;

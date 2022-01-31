@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static szs.findrefund.common.Constants.RefundConst.*;
+import static szs.findrefund.common.formatter.RefundFormatter.refundFormatter;
 
 @WebMvcTest(controllers = IncomeApiController.class,
             excludeFilters = {
@@ -69,9 +70,9 @@ class IncomeApiControllerTest {
     // then
     resultActions.andExpect(status().isOk())
         .andExpect(jsonPath("$.이름", is("홍길동")))
-        .andExpect(jsonPath("$.한도").value(MIN_PAYMENT_AMOUNT))
-        .andExpect(jsonPath("$.공제액").value(MIDDLE_REFUND_AMOUNT))
-        .andExpect(jsonPath("$.환급액").value(MAX_REFUND_AMOUNT))
+        .andExpect(jsonPath("$.한도").value(refundFormatter(MIN_PAYMENT_AMOUNT)))
+        .andExpect(jsonPath("$.공제액").value(refundFormatter(MIDDLE_REFUND_AMOUNT)))
+        .andExpect(jsonPath("$.환급액").value(refundFormatter(MAX_REFUND_AMOUNT)))
         .andDo(print());
   }
 

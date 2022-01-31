@@ -18,7 +18,7 @@ public class CommonExceptionHandler {
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
   protected ResponseEntity<CommonErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-    log.error("handleMethodArgumentNotValidException", CommonExceptionEnum.INVALID_INPUT_VALUE.getMsg());
+    log.error("handleMethodArgumentNotValidException: {}", CommonExceptionEnum.INVALID_INPUT_VALUE.getMsg());
     CommonErrorResponse errorResponse = CommonErrorResponse.of(CommonExceptionEnum.INVALID_INPUT_VALUE);
     return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
   }
@@ -28,7 +28,7 @@ public class CommonExceptionHandler {
    */
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
   protected ResponseEntity<CommonErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
-    log.error("handleHttpRequestMethodNotSupportedException", CommonExceptionEnum.METHOD_NOT_ALLOWED.getMsg());
+    log.error("handleHttpRequestMethodNotSupportedException: {}", CommonExceptionEnum.METHOD_NOT_ALLOWED.getMsg());
     CommonErrorResponse errorResponse = CommonErrorResponse.of(CommonExceptionEnum.METHOD_NOT_ALLOWED);
     return new ResponseEntity<>(errorResponse, HttpStatus.METHOD_NOT_ALLOWED);
   }

@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import szs.findrefund.common.enums.IncomeExceptionEnum;
 import szs.findrefund.common.exception.custom.ScrapLoadingException;
-import szs.findrefund.common.exception.user.UserErrorResponse;
 
 @Slf4j
 @RestControllerAdvice
@@ -18,7 +17,7 @@ public class IncomeExceptionHandler {
    */
   @ExceptionHandler(ScrapLoadingException.class)
   protected ResponseEntity<IncomeErrorResponse> handleScrapLoadingException(ScrapLoadingException e) {
-    log.error("handleScrapLoadingException", IncomeExceptionEnum.SCRAP_LOADING_EXCEPTION.getMsg());
+    log.error("handleScrapLoadingException: {}", IncomeExceptionEnum.SCRAP_LOADING_EXCEPTION.getMsg());
     IncomeErrorResponse incomeErrorResponse = IncomeErrorResponse.of(IncomeExceptionEnum.SCRAP_LOADING_EXCEPTION);
     return new ResponseEntity<>(incomeErrorResponse, HttpStatus.BAD_REQUEST);
   }

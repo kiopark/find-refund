@@ -32,11 +32,10 @@ public class SwaggerConfig {
 
   private ApiInfo swaggerInfo() {
     return new ApiInfoBuilder()
-        .title("SZS REST API")
-        .description("WebServer API, SZS Find-Refund-Project")
+        .title("삼쩜삼 회원의 숨은 환급금 찾기 서비스")
+        .description("SZS Find-Refund-Project")
         .version("1")
-        .termsOfServiceUrl("Terms of service")
-        .contact(new Contact("Park Ki O", "", "xowjd41@naver.com"))
+        .contact(new Contact("Park Ki O", "", "goril2504@gmail.com"))
         .build();
   }
 
