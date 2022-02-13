@@ -36,7 +36,7 @@ public class UserApiController {
   @ApiOperation(value = "로그인", notes = "로그인을 진행 합니다.")
   @PostMapping("/login")
   public ResponseEntity<JwtResponseDto> login(@ApiParam(value = "로그인 정보")
-                                              @RequestBody @Validated UserLoginRequestDto requestDto) throws Exception {
+                                              @RequestBody @Validated UserLoginRequestDto requestDto) {
     String jwtToken = userService.login(requestDto);
     return ResponseEntity.ok().body(new JwtResponseDto(jwtToken));
   }
@@ -47,6 +47,8 @@ public class UserApiController {
     String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
     Long idFromToken = JWTUtil.getIdFromToken(jwtToken);
     return ResponseEntity.ok().body(userService.findMyInfo(idFromToken));
+ // TODO
+ //   return ResponseEntity.ok().body(userService.findMyInfo(request.getAttribute("jwtToken")));
   }
 
 }

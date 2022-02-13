@@ -38,7 +38,7 @@ public class JWTUtil {
 
   @PostConstruct
   protected void init() {
-    secretKey = Base64.getEncoder().encodeToString(temp_secretKey.getBytes());
+    secretKey = Base64.getUrlEncoder().encodeToString(temp_secretKey.getBytes());
     expire_seconds = temp_expire_seconds;
   }
 

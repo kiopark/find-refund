@@ -63,7 +63,7 @@ class UserServiceTest {
 
     // when
     Method privateMethod = userService.getClass()
-        .getDeclaredMethod("validateDuplicateUsers", UserSignUpRequestDto.class);
+                                      .getDeclaredMethod("validateDuplicateUsers", UserSignUpRequestDto.class);
     privateMethod.setAccessible(true);
 
     // then
@@ -130,7 +130,7 @@ class UserServiceTest {
 
     // when
     Method privateMethod = userService.getClass()
-        .getDeclaredMethod("availableUsers", UserSignUpRequestDto.class);
+                                      .getDeclaredMethod("availableUsers", UserSignUpRequestDto.class);
     privateMethod.setAccessible(true);
 
     // then
@@ -146,7 +146,7 @@ class UserServiceTest {
 
     // when
     Method privateMethod = userService.getClass()
-        .getDeclaredMethod("availableUsers", UserSignUpRequestDto.class);
+                                      .getDeclaredMethod("availableUsers", UserSignUpRequestDto.class);
 
     privateMethod.setAccessible(true);
     Object methodResult = privateMethod.invoke(userService, requestDto);

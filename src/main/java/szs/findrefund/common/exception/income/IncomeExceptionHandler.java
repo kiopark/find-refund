@@ -16,7 +16,7 @@ public class IncomeExceptionHandler {
    * URL 스크랩 데이터가 존재하지 않거나 현재 서버와 통신중 일 경우
    */
   @ExceptionHandler(ScrapLoadingException.class)
-  protected ResponseEntity<IncomeErrorResponse> handleScrapLoadingException(ScrapLoadingException e) {
+  protected ResponseEntity<IncomeErrorResponse> handleScrapLoadingException() {
     log.error("handleScrapLoadingException: {}", IncomeExceptionEnum.SCRAP_LOADING_EXCEPTION.getMsg());
     IncomeErrorResponse incomeErrorResponse = IncomeErrorResponse.of(IncomeExceptionEnum.SCRAP_LOADING_EXCEPTION);
     return new ResponseEntity<>(incomeErrorResponse, HttpStatus.BAD_REQUEST);

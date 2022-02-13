@@ -18,7 +18,7 @@ public class JWTExceptionHandler {
    * 존재하지 않는 토큰 일 경우 발생
    */
   @ExceptionHandler(JwtValidException.class)
-  protected ResponseEntity<JWTErrorResponse> handleJwtValidExceptionException(JwtValidException e) {
+  protected ResponseEntity<JWTErrorResponse> handleJwtValidExceptionException() {
     log.error("handleJwtValidExceptionException: {}", JwtExceptionEnum.TOKEN_IS_NULL.getMsg());
     JWTErrorResponse jwtErrorResponse = JWTErrorResponse.of(JwtExceptionEnum.TOKEN_IS_NULL);
     return new ResponseEntity<>(jwtErrorResponse, HttpStatus.BAD_REQUEST);
@@ -28,7 +28,7 @@ public class JWTExceptionHandler {
    * 만료된 토큰 일 경우 발생
    */
   @ExceptionHandler(JwtExpiredException.class)
-  protected ResponseEntity<JWTErrorResponse> handleJwtExpiredException(JwtExpiredException e) {
+  protected ResponseEntity<JWTErrorResponse> handleJwtExpiredException() {
     log.error("handleJwtExpiredException: {}", JwtExceptionEnum.TOKEN_EXPIRED.getMsg());
     JWTErrorResponse jwtErrorResponse = JWTErrorResponse.of(JwtExceptionEnum.TOKEN_EXPIRED);
     return new ResponseEntity<>(jwtErrorResponse, HttpStatus.BAD_REQUEST);
@@ -38,7 +38,7 @@ public class JWTExceptionHandler {
    * 변조된 토큰 일 경우 발생
    */
   @ExceptionHandler(JwtTemperedException.class)
-  protected ResponseEntity<JWTErrorResponse> handleJwtTemperedException(JwtTemperedException e) {
+  protected ResponseEntity<JWTErrorResponse> handleJwtTemperedException() {
     log.error("handleJwtTemperedException: {}", JwtExceptionEnum.TOKEN_TAMPERED.getMsg());
     JWTErrorResponse jwtErrorResponse = JWTErrorResponse.of(JwtExceptionEnum.TOKEN_TAMPERED);
     return new ResponseEntity<>(jwtErrorResponse, HttpStatus.BAD_REQUEST);

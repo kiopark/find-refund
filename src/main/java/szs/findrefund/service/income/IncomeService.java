@@ -186,7 +186,6 @@ public class IncomeService {
    */
   private BigDecimal taxDeductionCalc(BigDecimal amount) {
     BigDecimal resultAmount = BigDecimal.ZERO;
-
     switch (DeductionAmountEnum.findDeductionStandard(amount)) {
       case 산출세액_기준_이하 :
         resultAmount = amount.multiply(new BigDecimal(0.55));

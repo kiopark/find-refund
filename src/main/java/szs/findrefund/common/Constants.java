@@ -60,9 +60,9 @@ public class Constants {
         Base64.getEncoder().encodeToString("test12345678909876543212345".getBytes());
     /* 테스트 전용 발급 토큰 */
     public static final String FAKE_ACCESS_TOKEN =
-        "eyJyZWdEYXRlIjoxNjQzNjA3MTc3Mzk4LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9" +
-        ".eyJpZCI6IjEiLCJpYXQiOjE2NDM2MDcxNzcsImV4cCI6MTY0NDQ3MTE3N30" +
-        ".dVkoEqVFjgFwD0iXRj_DfiGgw59Ci0VBtyg7qzEG618";
+        "eyJyZWdEYXRlIjoxNjQ0NzE2NTEyNDU3LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." +
+            "eyJpZCI6IjEiLCJpYXQiOjE2NDQ3MTY1MTIsImV4cCI6MTY0NTU4MDUxMn0." +
+            "jx2VSRYwUiufv2UD8AR7WnQG4XNkO1K4_wveqK6Xcsw";
   }
 
   /**

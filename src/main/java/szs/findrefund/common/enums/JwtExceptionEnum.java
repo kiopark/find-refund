@@ -1,11 +1,9 @@
 package szs.findrefund.common.enums;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @RequiredArgsConstructor
 public enum  JwtExceptionEnum {
 

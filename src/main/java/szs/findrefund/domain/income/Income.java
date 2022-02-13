@@ -45,6 +45,7 @@ public class Income extends BaseEntity {
 
   private String enterpriseRegNo;
 
+  // TODO : fetch = FetchType.LAZY
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "income_classfication_id")
   private IncomeClassfication incomeClassfication;

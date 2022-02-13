@@ -2,7 +2,6 @@ package szs.findrefund.interceptor;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -15,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Component
-@RequiredArgsConstructor
 public class JwtAuthenticationInterceptor implements HandlerInterceptor {
 
   @Override

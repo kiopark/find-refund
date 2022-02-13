@@ -17,7 +17,7 @@ public class CommonExceptionHandler {
    * @Validated 유효성검사에 binding 실패할 경우 발생
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  protected ResponseEntity<CommonErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+  protected ResponseEntity<CommonErrorResponse> handleMethodArgumentNotValidException() {
     log.error("handleMethodArgumentNotValidException: {}", CommonExceptionEnum.INVALID_INPUT_VALUE.getMsg());
     CommonErrorResponse errorResponse = CommonErrorResponse.of(CommonExceptionEnum.INVALID_INPUT_VALUE);
     return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -27,7 +27,7 @@ public class CommonExceptionHandler {
    * 지원하지 않는 HTTP method 호출 할 경우 발생
    */
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-  protected ResponseEntity<CommonErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+  protected ResponseEntity<CommonErrorResponse> handleHttpRequestMethodNotSupportedException() {
     log.error("handleHttpRequestMethodNotSupportedException: {}", CommonExceptionEnum.METHOD_NOT_ALLOWED.getMsg());
     CommonErrorResponse errorResponse = CommonErrorResponse.of(CommonExceptionEnum.METHOD_NOT_ALLOWED);
     return new ResponseEntity<>(errorResponse, HttpStatus.METHOD_NOT_ALLOWED);

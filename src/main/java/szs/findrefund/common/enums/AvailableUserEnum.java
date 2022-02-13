@@ -1,6 +1,5 @@
 package szs.findrefund.common.enums;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import szs.findrefund.web.dto.user.UserSignUpRequestDto;
@@ -8,7 +7,6 @@ import szs.findrefund.web.dto.user.UserSignUpRequestDto;
 import java.util.*;
 
 @Getter
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @RequiredArgsConstructor
 public enum AvailableUserEnum {
 
