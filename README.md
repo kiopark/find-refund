@@ -11,7 +11,7 @@
 
 ## 요구사항
 
-* 과제 구현 시 Java, Spring Boot, JPA, H2, Gradle 을 빠짐없이 모두 활용합니다. DB는 H2 Embeded DB를 사용
+* 구현 시 Java, Spring Boot, JPA, H2, Gradle 을 빠짐없이 모두 활용합니다. DB는 H2 Embeded DB를 사용
 * 회원가입, 환급액 계산, 유저 정보 조회 API를 구현
 * 모든 요청에 대해 application/json 타입으로 응답
 * 각 기능 및 제약사항에 대한 단위 테스트를 작성
