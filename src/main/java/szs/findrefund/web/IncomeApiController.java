@@ -22,7 +22,7 @@ public class IncomeApiController {
 
   private final IncomeService incomeService;
 
-  @ApiOperation(value = "URL 스크랩", notes = "제공된 스크랩 URL 을 호출 합니다.")
+  @ApiOperation(value = "URL 스크랩", notes = "제공된 스크랩 URL을 호출 합니다.")
   @PostMapping("/scrap")
   public ResponseEntity<String> userScrap(HttpServletRequest request) throws Exception {
     String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
