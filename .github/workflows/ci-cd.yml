@@ -28,6 +28,3 @@ jobs:
         distribution: 'temurin'
     - name: Build with Gradle
       run: ./gradlew clean build -x test
-      
-    - name: Test with Gradle
-      run: ./gradlew test
