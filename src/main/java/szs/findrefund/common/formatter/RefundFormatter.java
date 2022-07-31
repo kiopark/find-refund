@@ -11,25 +11,25 @@ public class RefundFormatter {
     String refundKor = refund.toString();
     int length = refundKor.length() - 1;
 
-    String result = "";
+    StringBuilder result = new StringBuilder();
     for (int i = length; i >= 3; i--) {
       char zeroInt = Integer.toString(0).charAt(0);
       char initInt = refundKor.charAt(length - i);
 
       if (i > 3) {
-        result += initInt;
+        result.append(initInt);
       }
 
       if (initInt != zeroInt && i == 3) {
-        result += (initInt + "천");
+        result.append(initInt).append("천");
       }
 
       if (i % 4 == 0) {
-        result += unit[i / 4];
+        result.append(unit[i / 4]);
       }
     }
 
-    result += "원";
-    return result;
+    result.append("원");
+    return result.toString();
   }
 }
